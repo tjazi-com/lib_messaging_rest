@@ -23,6 +23,13 @@ public class RestClientImpl implements RestClient {
         this.rootServiceUri = rootServiceUri;
     }
 
+    /**
+     * Send request via rest to the relative URL and get response
+     * @param relativeUri Relative URL
+     * @param requestObject Request object (message)
+     * @param expectedResponseType Expected type of the response message
+     * @return
+     */
     @Override
     public Object sendRequestGetResponse(String relativeUri, Object requestObject, Class expectedResponseType) {
 
@@ -51,6 +58,12 @@ public class RestClientImpl implements RestClient {
         return (Object)builder.post(inputEntity, expectedResponseType);
     }
 
+    /**
+     * Send request via rest interface and get response
+     * @param requestObject Request object (message)
+     * @param expectedResponseType Expected type of the response message
+     * @return
+     */
     @Override
     public Object sendRequestGetResponse(Object requestObject, Class expectedResponseType) {
         return this.sendRequestGetResponse(null, requestObject, expectedResponseType);
