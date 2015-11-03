@@ -16,4 +16,12 @@ public class RestClientFactoryImpl implements RestClientFactory {
     public RestClient createRestClient(URI targetUri) {
         return new RestClientImpl(targetUri);
     }
+
+    @Override
+    public RestClient createRestClient(String targetUri) {
+
+        return createRestClient(URI.create(targetUri));
+    }
+
+
 }

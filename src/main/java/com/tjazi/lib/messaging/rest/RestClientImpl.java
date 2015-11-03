@@ -23,6 +23,14 @@ public class RestClientImpl implements RestClient {
         this.rootServiceUri = rootServiceUri;
     }
 
+    public RestClientImpl(String rootServiceUriStr) {
+        if (rootServiceUriStr == null || rootServiceUriStr.isEmpty()) {
+            throw new IllegalArgumentException("'rootServiceUriStr' is null or empty.");
+        }
+
+        this.rootServiceUri = URI.create(rootServiceUriStr);
+    }
+
     /**
      * Send request via rest to the relative URL and get response
      * @param relativeUri Relative URL

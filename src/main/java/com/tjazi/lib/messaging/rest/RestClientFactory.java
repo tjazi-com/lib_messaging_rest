@@ -13,4 +13,5 @@ public interface RestClientFactory {
      * @return
      */
     RestClient createRestClient(URI targetUri);
+    RestClient createRestClient(String targetUri);
 }
