@@ -2,6 +2,8 @@ package com.tjazi.lib.messaging.rest;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
@@ -14,6 +16,8 @@ import java.util.Objects;
 public class RestClientImpl implements RestClient {
 
     private URI rootServiceUri = null;
+
+    private final static Logger log = LoggerFactory.getLogger(RestClientImpl.class);
 
     public RestClientImpl(URI rootServiceUri) {
         if (rootServiceUri == null) {
@@ -41,6 +45,8 @@ public class RestClientImpl implements RestClient {
     @Override
     public Object sendRequestGetResponse(String relativeUri, Object requestObject, Class expectedResponseType) {
 
+        log.debug("Requesting object POST. Root URL: {}, relative URL: {}", rootServiceUri, relativeUri);
+
         if (requestObject == null) {
             throw new IllegalArgumentException("'requestObject' is null.");
         }
@@ -51,17 +57,21 @@ public class RestClientImpl implements RestClient {
         ClientConfig clientConfig = new ClientConfig().register(new JacksonFeature());
 
         Client client = ClientBuilder.newClient(clientConfig);
-        WebTarget target = client.target(rootServiceUri);
+
+        String targetUrl = rootServiceUri.toString();
 
         if (relativeUri != null && !relativeUri.isEmpty()) {
-            target.path(relativeUri);
+            targetUrl += relativeUri;
         }
+
+        WebTarget target = client.target(targetUrl);
 
         Invocation.Builder builder = target
                 .request(MediaType.APPLICATION_JSON_TYPE);
 
         Entity inputEntity = Entity.json(requestObject);
 
+        log.debug("About to post object to: " + target.getUri());
 
         return (Object)builder.post(inputEntity, expectedResponseType);
     }
