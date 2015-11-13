@@ -5,6 +5,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.print.DocFlavor;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
@@ -58,11 +59,7 @@ public class RestClientImpl implements RestClient {
 
         Client client = ClientBuilder.newClient(clientConfig);
 
-        String targetUrl = rootServiceUri.toString();
-
-        if (relativeUri != null && !relativeUri.isEmpty()) {
-            targetUrl += relativeUri;
-        }
+        String targetUrl = this.createTargetUri(relativeUri);
 
         WebTarget target = client.target(targetUrl);
 
@@ -71,9 +68,9 @@ public class RestClientImpl implements RestClient {
 
         Entity inputEntity = Entity.json(requestObject);
 
-        log.debug("About to post object to: " + target.getUri());
+        log.debug("About to POST object to: " + target.getUri());
 
-        return (Object)builder.post(inputEntity, expectedResponseType);
+        return this.sendDataWaitForResponse(builder, inputEntity, expectedResponseType);
     }
 
     /**
@@ -85,5 +82,29 @@ public class RestClientImpl implements RestClient {
     @Override
     public Object sendRequestGetResponse(Object requestObject, Class expectedResponseType) {
         return this.sendRequestGetResponse(null, requestObject, expectedResponseType);
+    }
+
+    private String createTargetUri(String relativeUri) {
+        String targetUrl = rootServiceUri.toString();
+
+        if (relativeUri != null && !relativeUri.isEmpty()) {
+            targetUrl += relativeUri;
+        }
+
+        return targetUrl;
+    }
+
+    private Object sendDataWaitForResponse(Invocation.Builder builder,Entity inputEntity, Class expectedResponseType) {
+
+        try {
+            Object resultObject = (Object) builder.post(inputEntity, expectedResponseType);
+
+            return resultObject;
+        }
+        catch (Exception ex) {
+            log.error("Got error when posting object. Exception details: " + ex.toString());
+
+            return null;
+        }
     }
 }
